@@ -1,0 +1,180 @@
+#!/bin/bash
+
+DAEMON="/usr/local/bin/iroffer"
+NAME=iroffer
+USER=iroffer
+DESC="xdcc bot"
+ARGS="-b"
+
+DIRNAME=`dirname $0`
+CONFDIR=$DIRNAME/config
+PIDDIR=$DIRNAME/pid
+
+[ -f "$CONFDIR/$NAME.default" ] && . $CONFDIR/$NAME.default
+
+if [[ $CHROOT = "true" ]]; then
+  ARGS="$ARGS -t $CHROOT_DIR -u $CHROOT_USER $CHROOT_CONFDIR"
+  USER=root
+else
+  ARGS="$ARGS $CONFDIR"
+fi
+
+. /lib/lsb/init-functions
+
+if [ ! -e "$PIDDIR" ];then
+       mkdir -p "$PIDDIR"
+       if [[ $CHROOT = "true" ]]; then
+         chown $CHROOT_USER "$PIDDIR"
+       else
+         chown $USER "$PIDDIR"
+       fi
+fi
+
+start_iroffer(){
+  BOTNAME=$1
+  # see if stale pid file
+  if [ -f $PIDDIR/${BOTNAME}.pid ]; then
+    pid=`cat $PIDDIR/${BOTNAME}.pid`
+    if [ `ps -p $pid | wc -l` -eq 2 ]; then
+      log_failure_msg "  $BOTNAME already running"
+      return
+    else
+      log_warning_msg "  Stale PID File for $BOTNAME"
+    fi
+  fi
+
+  log_daemon_msg "  Starting iroffer $BOTNAME..."
+  /bin/su -l $USER -c "$DAEMON $ARGS/$BOTNAME.config"
+}
+
+stop_iroffer(){
+  BOTNAME=$1
+  if [ -f $PIDDIR/${BOTNAME}.pid ]; then
+    pid=`cat $PIDDIR/${BOTNAME}.pid`
+    echo -n "  Stopping $NAME $BOTNAME"
+    for i in `seq 30`; do
+      echo -n "."
+      if [ `ps -p $pid | wc -l` -eq 2 ]; then
+        kill $pid
+      else
+        echo OK
+        return
+      fi
+      sleep 1
+    done
+    echo FAILED
+  else
+    log_warning_msg "  $PIDDIR/${BOTNAME}.pid no found"
+  fi
+}
+
+reload_iroffer(){
+  BOTNAME=$1
+  if [ -f $PIDDIR/${BOTNAME}.pid ]; then
+    pid=`cat $PIDDIR/${BOTNAME}.pid`
+    log_daemon_msg "  Reloading config of $BOTNAME"
+    kill -n 12 $pid
+  else
+    log_failure_msg "  $PIDDIR/${BOTNAME}.pid no found"
+  fi
+}
+
+start(){
+    log_daemon_msg "Starting $DESC" "$NAME"
+    cd $DIRNAME
+
+    # make sure filesystem isn't full
+    freespace=`df -k . | tail -1 | awk {'print $4'}`
+    if [ $freespace -lt 10 ]; then
+      log_failure_msg "Filesystem Full!"
+      exit
+    fi
+    if test -z "$2" ; then
+      for BOT in `cd $CONFDIR; ls *.config 2> /dev/null`; do
+        BOTNAME=${BOT%%.config}
+        start_iroffer $BOTNAME
+      done
+    else
+      while shift ; do
+        [ -z "$1" ] && break
+        BOTNAME=$1
+        if test -e $CONFDIR/$BOTNAME.config ; then
+            start_iroffer $BOTNAME
+        else
+          log_failure_msg "$BOTNAME, missing $CONFDIR/$BOTNAME.config"
+        fi
+      done
+    fi
+}
+stop(){
+    log_daemon_msg "Stopping $DESC" "$NAME"
+    if test -z "$2" ; then
+      for BOT in `cd $CONFDIR; ls *.config 2> /dev/null`; do
+        BOTNAME=${BOT%%.config}
+        stop_iroffer $BOTNAME
+      done
+    else
+      while shift ; do
+        [ -z "$1" ] && break
+        BOTNAME=$1
+        if test -e $CONFDIR/$BOTNAME.config ; then
+            stop_iroffer $BOTNAME
+        else
+          log_failure_msg "$BOTNAME, missing $CONFDIR/$BOTNAME.config"
+        fi
+      done
+    fi
+}
+status(){
+    if test -z "$2" ; then
+      for BOT in `cd $CONFDIR; ls *.config 2> /dev/null`; do
+        BOTNAME=${BOT%%.config}
+        status_of_proc -p "$PIDDIR/$BOTNAME.pid" "$DAEMON" "$DESC $BOTNAME"
+      done
+    else
+      while shift ; do
+        [ -z "$1" ] && break
+        BOTNAME=$1
+        status_of_proc -p "$PIDDIR/$BOTNAME.pid" "$DAEMON" "$DESC $BOTNAME"
+      done
+    fi
+}
+
+case $1 in
+  start)
+    start $@;
+  ;;
+  stop)
+    stop $@
+  ;;
+  restart)
+    stop $@
+    start $@
+  ;;
+  reload)
+    log_daemon_msg "Reloading $DESC" "$NAME"
+    if test -z "$2" ; then
+      for BOT in `cd $CONFDIR; ls *.config 2> /dev/null`; do
+        BOTNAME=${BOT%%.config}
+        reload_iroffer $BOTNAME
+      done
+    else
+      while shift ; do
+        [ -z "$1" ] && break
+        BOTNAME=$1
+        if test -e $CONFDIR/$BOTNAME.config ; then
+            reload_iroffer $BOTNAME
+        else
+          log_failure_msg "$BOTNAME, missing $CONFDIR/$BOTNAME.config"
+        fi
+      done
+    fi
+  ;;
+  status)
+    status $@
+  ;;
+  *)
+  log_failure_msg "Usage: $0 {start|stop|restart|reload|status} [`cd $CONFDIR; ls -m *.config 2> /dev/null | sed 's/\.config//g;s/, /|/g'`]"
+  exit 1
+  ;;
+esac

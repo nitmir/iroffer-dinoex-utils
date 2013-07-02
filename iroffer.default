@@ -1,0 +1,5 @@
+#!/bin/sh
+CHROOT=true
+CHROOT_DIR=/home/iroffer
+CHROOT_USER=iroffer
+CHROOT_CONFDIR="/iroffer/config"
