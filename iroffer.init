@@ -7,7 +7,9 @@ DESC="xdcc bot"
 ARGS="-b"
 
 DIRNAME=`dirname $0`
+
 CONFDIR=$DIRNAME/config
+METACONFDIR=$DIRNAME
 PIDDIR=$DIRNAME/pid
 
 [ -f "$CONFDIR/$NAME.default" ] && . $CONFDIR/$NAME.default
@@ -29,6 +31,16 @@ if [ ! -e "$PIDDIR" ];then
          chown $USER "$PIDDIR"
        fi
 fi
+
+genconf_iroffer(){
+  BOTNAME=$1
+  if [ -f $METACONFDIR/$BOTNAME.py ]; then
+    log_daemon_msg "  Generating config for $BOTNAME"
+    $METACONFDIR/$BOTNAME.py > $CONFDIR/$BOTNAME.config
+  else
+    log_failure_msg " File $DIRNAME/$BOTNAME.py missing"
+  fi
+}
 
 start_iroffer(){
   BOTNAME=$1
@@ -139,6 +151,20 @@ status(){
       done
     fi
 }
+genconf(){
+    if test -z "$2" ; then
+      for BOT in `cd $CONFDIR; ls *.config 2> /dev/null`; do
+        BOTNAME=${BOT%%.config}
+        genconf_iroffer $BOTNAME
+      done
+    else
+      while shift ; do
+        [ -z "$1" ] && break
+        BOTNAME=$1
+        genconf_iroffer $BOTNAME
+      done
+    fi
+}
 
 case $1 in
   start)
@@ -173,8 +199,11 @@ case $1 in
   status)
     status $@
   ;;
+  genconf)
+    genconf $@;
+  ;;
   *)
-  log_failure_msg "Usage: $0 {start|stop|restart|reload|status} [`cd $CONFDIR; ls -m *.config 2> /dev/null | sed 's/\.config//g;s/, /|/g'`]"
+  log_failure_msg "Usage: $0 {start|stop|restart|reload|status|genconf} [`cd $CONFDIR; ls -m *.config 2> /dev/null | sed 's/\.config//g;s/, /|/g'`]"
   exit 1
   ;;
 esac
