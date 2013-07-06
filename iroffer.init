@@ -211,7 +211,6 @@ case $1 in
     restart $@
   ;;
   reload)
-    log_daemon_msg "Reloading $DESC" "$NAME"
     if test -z "$2" ; then
       for BOT in `cd $CONFDIR; ls *.config 2> /dev/null`; do
         BOTNAME=${BOT%%.config}

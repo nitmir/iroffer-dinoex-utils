@@ -1,7 +1,7 @@
 #!/usr/bin/env python 
 # -*- coding: utf-8 -*-
 
-def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_list, autosend_list, headline, adminpass, adminhost, hadminpass, hadminhost, telnet_port=None, restrictprivlistmsg=None):
+def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_list, autosend_list, headline, adminpass, adminhost, hadminpass, hadminhost, telnet_port=None, restrictprivlistmsg=None, uploaddir=[], uploadhost=[]):
 ##############################################################################
 ##                       iroffer 1.4.b03 config file                        ##
 ##            lines starting with "#" or are blank are ignored              ##
@@ -1427,6 +1427,10 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 #uploadhost *!me@192.168.10.#
 #uploaddir /home/me/upload
 #uploadmaxsize 10
+    for dir in uploaddir:
+      print "uploaddir %s" % dir
+    for host in uploadhost:
+      print "uploadhost %s" % host
 
 ##############################################################################
 ###                          - upload min space -                          ###
