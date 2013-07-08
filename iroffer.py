@@ -1,7 +1,19 @@
 #!/usr/bin/env python 
 # -*- coding: utf-8 -*-
+import os
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("-t", "--telnet", type=str, help="parth to telnet port file")
+
+def parse_arguments(telnet_port):
+    args = parser.parse_args()
+    if args.telnet and telnet_port:
+        with open(args.telnet, 'w') as f:
+            f.write("%s\n" % telnet_port)
+
 
 def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_list, autosend_list, headline, adminpass, adminhost, hadminpass, hadminhost, telnet_port=None, restrictprivlistmsg=None, uploaddir=[], uploadhost=[]):
+    parse_arguments(telnet_port)
 ##############################################################################
 ##                       iroffer 1.4.b03 config file                        ##
 ##            lines starting with "#" or are blank are ignored              ##
@@ -111,6 +123,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ###                           - xdcc xml file -                            ###
 ### if you want to export your packlist in XML define xdccxmlfile.         ###
 #xdccxmlfile mybot.xml
+    print "xdccxmlfile %s/list/%s.xml" % (path, mybot)
 
 ##############################################################################
 ###                              - charset -                               ###

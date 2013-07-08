@@ -9,9 +9,9 @@ ARGS="-b"
 DIRNAME=`dirname $0`
 
 CONFDIR=$DIRNAME/config
+TELNET_PORT=$DIRNAME/telnet
 METACONFDIR=$DIRNAME
 PIDDIR=$DIRNAME/pid
-
 [ -f "$CONFDIR/$NAME.default" ] && . $CONFDIR/$NAME.default
 
 if [[ $CHROOT = "true" ]]; then
@@ -40,11 +40,26 @@ need_root(){
  fi
 }
 
+telnet_iroffer(){
+  BOTNAME=$1
+  if [ -f "$TELNET_PORT/$BOTNAME.port" ]; then
+    log_daemon_msg "Starting telnet console for $BOTNAME"
+    CMD="nc 127.0.0.1 `cat \"$TELNET_PORT/$BOTNAME.port\"`"
+    if which rlwrap >/dev/null; then
+      rlwrap --command-name telnet_$BOTNAME $CMD
+    else
+      $CMD
+    fi
+  else
+    log_failure_msg "File $TELNET_PORT/$BOTNAME.port missing"
+  fi
+}
+
 genconf_iroffer(){
   BOTNAME=$1
   if [ -f $METACONFDIR/$BOTNAME.py ]; then
     log_daemon_msg "Generating config for $BOTNAME"
-    $METACONFDIR/$BOTNAME.py > $CONFDIR/$BOTNAME.config
+    $METACONFDIR/$BOTNAME.py -t "$TELNET_PORT/$BOTNAME.port" > $CONFDIR/$BOTNAME.config
     log_end_msg $?
   else
     log_failure_msg " File $DIRNAME/$BOTNAME.py missing"
@@ -234,8 +249,11 @@ case $1 in
   genconf)
     genconf $@;
   ;;
+  telnet)
+   telnet_iroffer $2;
+  ;;
   *)
-  log_failure_msg "Usage: $0 {start|stop|restart|reload|status|genconf} [`cd $CONFDIR; ls -m *.config 2> /dev/null | sed 's/\.config//g;s/, /|/g'`]"
+  log_failure_msg "Usage: $0 {start|stop|restart|reload|status|genconf|telnet} [`cd $CONFDIR; ls -m *.config 2> /dev/null | sed 's/\.config//g;s/, /|/g'`]"
   exit 1
   ;;
 esac
