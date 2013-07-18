@@ -5,6 +5,8 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-t", "--telnet", type=str, help="parth to telnet port file")
 
+version = "3.30"
+
 def parse_arguments(telnet_port):
     args = parser.parse_args()
     if args.telnet and telnet_port:
@@ -12,7 +14,9 @@ def parse_arguments(telnet_port):
             f.write("%s\n" % telnet_port)
 
 
-def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_list, autosend_list, headline, adminpass, adminhost, hadminpass, hadminhost, telnet_port=None, restrictprivlistmsg=None, uploaddir=[], uploadhost=[]):
+def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_list, autosend_list,
+           headline, adminpass, adminhost, hadminpass, hadminhost, telnet_port=None, restrictprivlistmsg=None,
+           uploaddir=[], uploadhost=[], downloadhost_list=[]):
     parse_arguments(telnet_port)
 ##############################################################################
 ##                       iroffer 1.4.b03 config file                        ##
@@ -417,7 +421,8 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ###                             - nickserv -                               ###
 ### If you would like to register with nickserv add settings here.         ###
 ### This setting can be global or per network.                             ###
-    print "nickserv_pass %s" % nickserv_pass
+    if nickserv_pass:
+        print "nickserv_pass %s" % nickserv_pass
 
 ##############################################################################
 ###                             - auth name -                              ###
@@ -1111,7 +1116,11 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### Multiple hostmasks can be specified                                    ###
 ### wild cards are:                                                        ###
 ###  * = 0 or more characters,  ? = 1 character,  # = any positive integer ###
-    print "downloadhost *!*@*"
+    if downloadhost_list:
+        for downloadhost in downloadhost_list:
+          print "downloadhost %s" % downloadhost
+    else:
+        print "downloadhost *!*@*"
 #downloadhost *!~me@*.domain.com
 #downloadhost *!me@192.168.10.#
 
