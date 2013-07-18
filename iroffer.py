@@ -16,7 +16,7 @@ def parse_arguments(telnet_port):
 
 def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_list, autosend_list,
            headline, adminpass, adminhost, hadminpass, hadminhost, telnet_port=None, restrictprivlistmsg=None,
-           uploaddir=[], uploadhost=[], downloadhost_list=[]):
+           uploaddir_list=[], uploadhost_list=[], downloadhost_list=[]):
     parse_arguments(telnet_port)
 ##############################################################################
 ##                       iroffer 1.4.b03 config file                        ##
@@ -1449,9 +1449,9 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 #uploadhost *!me@192.168.10.#
 #uploaddir /home/me/upload
 #uploadmaxsize 10
-    for dir in uploaddir:
+    for dir in uploaddir_list:
       print "uploaddir %s" % dir
-    for host in uploadhost:
+    for host in uploadhost_list:
       print "uploadhost %s" % host
 
 ##############################################################################

@@ -1,5 +1,5 @@
 #!/bin/sh
-CHROOT=true
-CHROOT_DIR=/home/iroffer
+CHROOT=false
+CHROOT_DIR=/etc/iroffer
 CHROOT_USER=iroffer
 CHROOT_CONFDIR="/iroffer/config"
