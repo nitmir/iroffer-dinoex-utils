@@ -8,7 +8,7 @@ install:
 	install -d -o iroffer -g root /etc/iroffer/list
 	install -d -o iroffer -g root /etc/iroffer/state
 	install -o root -g root -m 0644 iroffer.py /etc/iroffer/iroffer.py
-	install -o root -g root -m 0644 sample.py /etc/iroffer/sample.py
+	install -o root -g root -m 0755 sample.py /etc/iroffer/sample.py
 	install -o root -g root -m 0644 iroffer.default /etc/iroffer/config/iroffer.default
 	echo "For a sample bot run : touch /etc/iroffer/config/sample.config && /etc/init.d/iroffer genconf"
 
