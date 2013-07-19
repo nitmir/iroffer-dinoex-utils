@@ -31,6 +31,21 @@ view ```/etc/init_script_name``` for each init script
 (and a ```/etc/init_script_name/config/init_script_name.default``` for chroot config).
 
 
+### Fonctionnalities
+
+You can call ```/etc/init.d/iroffer command Botname``` to do command on botname only
+or just call ```/etc/init.d/iroffer command``` to do command on all bots.
+
+The list of possible command is : 
+ * start
+ * stop
+ * restart
+ * reload
+ * status
+ * reconnect (force bot to change server, handy during netsplits)
+ * genconf (call the generation script if used)
+ * telnet (can only be called with a bot name as parameter : open a telnet admin console)
+
 ## Generation script
 
 It's a quite simple python script writed from the sample config file of iroffer.

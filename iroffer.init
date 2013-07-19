@@ -142,6 +142,18 @@ reload_iroffer(){
   fi
 }
 
+reconnect_iroffer(){
+  BOTNAME=$1
+  need_root
+  if [ -f $PIDDIR/${BOTNAME}.pid ]; then
+    pid=`cat $PIDDIR/${BOTNAME}.pid`
+    log_daemon_msg "Reconnecting $BOTNAME"
+    kill -n 10 $pid
+  else
+    log_failure_msg "$PIDDIR/${BOTNAME}.pid no found"
+  fi
+}
+
 start(){
     # make sure filesystem isn't full
     freespace=`df -k . | tail -1 | awk {'print $4'}`
@@ -267,6 +279,24 @@ case $1 in
       done
     fi
   ;;
+  reconnect)
+    if test -z "$2" ; then
+      for BOT in `cd $CONFDIR; ls *.config 2> /dev/null`; do
+        BOTNAME=${BOT%%.config}
+        reconnect_iroffer $BOTNAME
+      done
+    else
+      while shift ; do
+        [ -z "$1" ] && break
+        BOTNAME=$1
+        if test -e $CONFDIR/$BOTNAME.config ; then
+            reconnect_iroffer $BOTNAME
+        else
+          log_failure_msg "$BOTNAME, missing $CONFDIR/$BOTNAME.config"
+        fi
+      done
+    fi
+  ;;
   status)
     status $@
   ;;
@@ -277,7 +307,7 @@ case $1 in
    telnet_iroffer $2;
   ;;
   *)
-  log_failure_msg "Usage: $0 {start|stop|restart|reload|status|genconf|telnet} [`cd $CONFDIR; ls -m *.config 2> /dev/null | sed 's/\.config//g;s/, /|/g'`]"
+  log_failure_msg "Usage: $0 {start|stop|restart|reload|status|reconnect|genconf|telnet} [`cd $CONFDIR; ls -m *.config 2> /dev/null | sed 's/\.config//g;s/, /|/g'`]"
   exit 1
   ;;
 esac
