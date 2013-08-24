@@ -3,3 +3,5 @@ CHROOT=false
 CHROOT_DIR=/etc/iroffer
 CHROOT_USER=iroffer
 CHROOT_CONFDIR="/iroffer/config"
+
+#CHROOT_EXEC=$CHROOT_DIR/bind.sh

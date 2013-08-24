@@ -103,7 +103,9 @@ start_iroffer(){
       log_warning_msg "Stale PID File for $BOTNAME"
     fi
   fi
-
+  if [ "$CHROOT" = "true" ] && [ -n "$CHROOT_EXEC" ]; then
+    eval "$CHROOT_EXEC"
+  fi
   log_daemon_msg "Starting iroffer $BOTNAME..."
   /bin/su -l $USER -c "$DAEMON $ARGS/$BOTNAME.config"
 }
