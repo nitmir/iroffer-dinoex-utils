@@ -10,9 +10,10 @@
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import os
+import sys
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("-t", "--telnet", type=str, help="parth to telnet port file")
+parser.add_argument("-t", "--telnet", type=str, help="path to telnet port file")
 
 version = "3.30"
 
@@ -25,8 +26,14 @@ def parse_arguments(telnet_port):
 
 def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_list, autosend_list,
            headline, adminpass, adminhost, hadminpass, hadminhost, telnet_port=None, restrictprivlistmsg=None,
-           uploaddir_list=[], uploadhost_list=[], downloadhost_list=[]):
-    parse_arguments(telnet_port)
+           uploaddir_list=[], uploadhost_list=[], downloadhost_list=[], print_config=True):
+    if "-t" in sys.argv[1:] or "--telnet" in sys.argv[1:]:
+        parse_arguments(telnet_port)
+
+    config.confstr=""
+    def myprint(str):
+        config.confstr+="%s\n" % str
+
 ##############################################################################
 ##                       iroffer 1.4.b03 config file                        ##
 ##            lines starting with "#" or are blank are ignored              ##
@@ -45,18 +52,18 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ###                             - pid file -                               ###
 ### Writes the process id to this file on startup                          ###
 
-    print "pidfile %s/pid/%s.pid" % (path, mybot)
+    myprint("pidfile %s/pid/%s.pid" % (path, mybot))
 
 ##############################################################################
 ###                             - log file -                               ###
 ### Writes logging information to this file.                               ###
-    print "logfile %s/log/%s.log" % (path, mybot)
+    myprint("logfile %s/log/%s.log" % (path, mybot))
 
 ##############################################################################
 ###                            - log rotate -                              ###
 ### After the time given here a logfile will be rotated.                   ###
 ### logrotate can be set to none, 1 - 24 hours, daily, weekly or monthly   ###
-    print "logrotate weekly"
+    myprint("logrotate weekly")
 
 ##############################################################################
 ###                         - expire logfiles -                            ###
@@ -69,12 +76,12 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ###                            - log stats -                               ###
 ### Setting logstats will log statistical information and this will also   ###
 ###  send this stats to a dcc chat if one is active.                       ###
-    print "logstats yes"
+    myprint("logstats yes")
 
 ##############################################################################
 ###                             - state file -                             ###
 ### temporary storage for iroffer state information across restarts        ###
-    print "statefile %s/state/%s.state" % (path, mybot)
+    myprint("statefile %s/state/%s.state" % (path, mybot))
 
 ##############################################################################
 ###                          - old state file -                            ###
@@ -101,7 +108,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### needed.                                                                ###
 ### If xdcclistfileraw is set the file will be written with the IRC        ###
 ### control characters included (color, formatting, etc..).                ###
-    print "xdcclistfile %s/list/%s.txt" % (path, mybot)
+    myprint("xdcclistfile %s/list/%s.txt" % (path, mybot))
 #xdcclistfileraw
 
 ##############################################################################
@@ -115,7 +122,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### printed between group name and group description.                      ###
 ### Default: space                                                         ###
 #group_seperator " "
-    print 'group_seperator " - "'
+    myprint('group_seperator " - "')
 
 ##############################################################################
 ###                         - dos text files -                             ###
@@ -130,13 +137,13 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### A value of -1 will send the xdcclistfile without creating a pack.      ###
 ### Default: off                                                           ###
 #send_listfile 1
-    print "send_listfile -1"
+    myprint("send_listfile -1")
 
 ##############################################################################
 ###                           - xdcc xml file -                            ###
 ### if you want to export your packlist in XML define xdccxmlfile.         ###
 #xdccxmlfile mybot.xml
-    print "xdccxmlfile %s/list/%s.xml" % (path, mybot)
+    myprint("xdccxmlfile %s/list/%s.xml" % (path, mybot))
 
 ##############################################################################
 ###                              - charset -                               ###
@@ -281,7 +288,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### Port for the build-in Telnet server.                                   ###
 ### To login you must add adminhost or hadminhost with "telnet!*@telnet"   ###
 ### Default: 0 = disabled.                                                 ###
-    print "telnet_port %s" % telnet_port
+    myprint("telnet_port %s" % telnet_port)
 
 ##############################################################################
 ###                           - telnet vhost -                             ###
@@ -290,14 +297,14 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### Use "::1" or "127.0.0.1" to limit access to localhost only.            ###
 ### Default: disabled.                                                     ###
 #telnet_vhost ::1
-    print "telnet_vhost 127.0.0.1"
+    myprint("telnet_vhost 127.0.0.1")
 
 ##############################################################################
 ###                           - telnet allow -                             ###
 ### Defines ip networks, which are allowed to access the bot via telent.   ###
 ### Multiple ip networks can be specified                                  ###
 ### Default: all.                                                          ###
-    print "telnet_allow 127.0.0.1"
+    myprint("telnet_allow 127.0.0.1")
 #telnet_allow 192.168.1.0/24
 
 ##############################################################################
@@ -339,7 +346,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ###                                custom set of commands, see proxyinfo   ###
 ###                                below for more information              ###
 ### most people will want to use the direct                                ###
-    print "connectionmethod direct"
+    myprint("connectionmethod direct")
 
 ##############################################################################
 ###                       - custom connection info -                       ###
@@ -431,7 +438,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### If you would like to register with nickserv add settings here.         ###
 ### This setting can be global or per network.                             ###
     if nickserv_pass:
-        print "nickserv_pass %s" % nickserv_pass
+        myprint("nickserv_pass %s" % nickserv_pass)
 
 ##############################################################################
 ###                             - auth name -                              ###
@@ -457,7 +464,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 #server irc.efnet.net 6667
 #server irc.efnet.net 6667 server-password
     for (server, port) in server_list:
-      print "server %s %s" % (server, port)
+      myprint("server %s %s" % (server, port))
 
 ##############################################################################
 ###                         - channels (up to 50) -                        ###
@@ -500,7 +507,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 #channel #chan04 -plist 14 -pformat full -joinmsg "!voiceme"
 #channel #chan04 -plist 14 -pformat full -fish secret
     for chan in chan_list:
-      print "channel %s" % chan
+      myprint("channel %s" % chan)
 
 # 1st Network
 #network rizon4
@@ -541,13 +548,13 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ##############################################################################
 ###                          - reconnect delay -                           ###
 ### Do not reconnect when connections is dropped for given seconds.        ###
-    print "reconnect_delay 15"
+    myprint("reconnect_delay 15")
 
 ##############################################################################
 ###                          - user information -                          ###
 ### user_nick global setting is required, can be changed per network       ###
-    print "user_nick %s" % nick
-    print "user_realname %s" % mybot
+    myprint("user_nick %s" % nick)
+    myprint("user_realname %s" % mybot)
 
 ##############################################################################
 ###                             - user mode -                              ###
@@ -556,7 +563,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### i Invisible (not shown in /who)                                        ###
 ### Modes are diffrent on the IRC networks you use, please read the docs   ###
 ### for your networks before setting then.                                 ###
-    print "user_modes +iB"
+    myprint("user_modes +iB")
 
 ##############################################################################
 ###                             - owner nick -                             ###
@@ -658,17 +665,17 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 
 ##############################################################################
 ###                         - maximum xdcc slots -                         ###
-    print "slotsmax 20"
+    myprint("slotsmax 20")
 
 ##############################################################################
 ###                         - Queue Information -                          ###
 ### Main Queue Size, set to 0 for no queue                                 ###
-    print "queuesize 10"
+    myprint("queuesize 10")
 
 ##############################################################################
 ###                      - max transfers per person -                      ###
 ### maximum transfers per person at a time                                 ###
-    print "maxtransfersperperson 1"
+    myprint("maxtransfersperperson 1")
 
 ##############################################################################
 ###                        - ignore duplicate ip -                         ###
@@ -680,18 +687,18 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ##############################################################################
 ###                     - max queued items per person -                    ###
 ### maximum number of times a user can be in a queue simultaneously        ###
-    print "maxqueueditemsperperson 2"
+    myprint("maxqueueditemsperperson 2")
 
 ##############################################################################
 ###                          - idle queue size -                           ###
 ### Idle queue size, set to 0 for no queue                                 ###
 ### This queue is required to support XDCC BACTH.                          ###
-    print "idlequeuesize 100"
+    myprint("idlequeuesize 100")
 
 ##############################################################################
 ###                 - max idle queued items per person -                   ###
 ### maximum number of times a user can be in the idle queue simultaneously ###
-    print "maxidlequeuedperperson 20"
+    myprint("maxidlequeuedperperson 20")
 
 ##############################################################################
 ###                        - balanced_queue -                              ###
@@ -699,13 +706,13 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### queue would NOT be a file queued by the same user. This helps to       ###
 ### distribute the bandwidth better in bots with few slots.                ###
 ### Default: first in, first out                                           ###
-    print "balanced_queue"
+    myprint("balanced_queue")
 
 ##############################################################################
 ###                         - requeue_sends -                              ###
 ### When the bot shutdowns, sends are aborted. With this option set, sends ###
 ### are saved with the queued items, so transfers might resume on restart. ###
-    print "requeue_sends"
+    myprint("requeue_sends")
 
 ##############################################################################
 ###                        - reminder send retry -                         ###
@@ -717,7 +724,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ###                          - send batch -                                ###
 ### Permit XDCC BATCH. The packs are Queued up in the bot is possible.     ###
 ### Default: disabled                                                      ###
-    print "send_batch"
+    myprint("send_batch")
 
 ##############################################################################
 ###                            - holdqueue -                               ###
@@ -735,13 +742,13 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### multiple directories can be configured.                                ###
 #filedir /home/me/files
     for filedir in filedir_list:
-      print "filedir %s" % filedir
+      myprint("filedir %s" % filedir)
 
 ##############################################################################
 ###                 - no duplicate files -                                 ###
 ### When configured, add, adddir and addnew refuses to add a files that    ###
 ### already have been added.                                               ###
-    print "noduplicatefiles"
+    myprint("noduplicatefiles")
 
 ##############################################################################
 ###                   - no duplicate filenames -                           ###
@@ -753,7 +760,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ###                     - include subdirs -                                ###
 ### When configured, addir, addnew and removedir will scan into sub-       ###
 ### directories and process the files found.                               ###
-    print "include_subdirs"
+    myprint("include_subdirs")
 
 ##############################################################################
 ###                     - subdirs delayed -                                ###
@@ -783,32 +790,32 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ###                        - auto default group -                          ###
 ### When adding a new file, search for matching filenames and add the new  ###
 ### file to the same group.                                                ###
-    print "auto_default_group"
+    myprint("auto_default_group")
 
 ##############################################################################
 ###                          - auto path group -                           ###
 ### When adding a new file, search for matching directories and add the    ###
 ### new file to the same group.                                            ###
-    print "auto_path_group"
+    myprint("auto_path_group")
 
 ##############################################################################
 ###                        - auto crc check -                              ###
 ### When adding a new file, verify the crc32 in the given filename.        ###
-    print "auto_crc_check"
+    myprint("auto_crc_check")
 
 ##############################################################################
 ###                   - crc exclude pattern -                              ###
 ### When configured, auto crc check will ignore files matching this        ###
 ### patterns.                                                              ###
-    print "autocrc_exclude *.torrent"
-    print "autocrc_exclude *.xdelta"
+    myprint("autocrc_exclude *.torrent")
+    myprint("autocrc_exclude *.xdelta")
 
 ##############################################################################
 ###                 - adddir exclude pattern -                             ###
 ### When configured, addir, adnew and autoadd will skip all files or dirs  ###
 ### that match this patterns.                                              ###
-    print "adddir_exclude *.txt"
-    print "adddir_exclude *.md5"
+    myprint("adddir_exclude *.txt")
+    myprint("adddir_exclude *.md5")
 
 ##############################################################################
 ###                  - adddir match pattern -                              ###
@@ -849,7 +856,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### printed between pack number and name on announce.                      ###
 ### Default: space                                                         ###
 #announce_seperator " "
-    print 'announce_seperator " - "'
+    myprint('announce_seperator " - "')
 
 ##############################################################################
 ###                       - announce size -                                ###
@@ -958,21 +965,21 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### use restrictprivlistmsg to change the message that restrictprivlist    ###
 ### sends                                                                  ###
 ### restrictsend, restrictlist can be global or per network.               ###
-    print "restrictlist"
+    myprint("restrictlist")
     if restrictprivlistmsg:
-      print "restrictprivlist"
-      print "restrictprivlistmsg %s" % restrictprivlistmsg
-    print "restrictsend"
+      myprint("restrictprivlist")
+      myprint("restrictprivlistmsg %s" % restrictprivlistmsg)
+    myprint("restrictsend")
 
 ##############################################################################
 ###                      - restrictsend warning -                          ###
 ### If set, it will try to warn the user when he/she leaves the channel.   ###
-    print "restrictsend_warning"
+    myprint("restrictsend_warning")
 
 ##############################################################################
 ###                      - restrictsend timeout -                          ###
 ### Timeout in seconds to cancel transfer after user left channel.         ###
-    print "restrictsend_timeout 300"
+    myprint("restrictsend_timeout 300")
 
 ##############################################################################
 ###                       - restrictsend delay -                           ###
@@ -996,7 +1003,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### If set to 1, further queued messages are dropped.                      ###
 ### If set to 2, all this nicks queued packs are removed.                  ###
 ### Default: 0, no action.                                                 ###
-    print "remove_dead_users 2"
+    myprint("remove_dead_users 2")
 
 ##############################################################################
 ###                         - need voice -                                 ###
@@ -1111,7 +1118,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ###                   - bypass queue for small files -                     ###
 ### If someone requests a small file, bypass queue and max sends.  If the  ###
 ### offered file is under this size (in KB), send immediately.             ###
-    print "smallfilebypass 1024"
+    myprint("smallfilebypass 1024")
 
 ##############################################################################
 ###                      - spaces in filenames -                           ###
@@ -1127,9 +1134,9 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ###  * = 0 or more characters,  ? = 1 character,  # = any positive integer ###
     if downloadhost_list:
         for downloadhost in downloadhost_list:
-          print "downloadhost %s" % downloadhost
+          myprint("downloadhost %s" % downloadhost)
     else:
-        print "downloadhost *!*@*"
+        myprint("downloadhost *!*@*")
 #downloadhost *!~me@*.domain.com
 #downloadhost *!me@192.168.10.#
 
@@ -1211,17 +1218,17 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### If packs are queued, and the bandwidth usage is below this amount, a   ###
 ### queued person will be sent their pack. (K/sec)                         ###
 ### WARNING! do not set this amount to an unreasonably high number!        ###
-    print "lowbdwth 15"
+    myprint("lowbdwth 15")
 
 ##############################################################################
 ###                         - transfer min speed -                         ###
 ### Per-transfer min speed in KB/sec used unless 'chmins' set per pack.    ###
-    print "transferminspeed 10"
+    myprint("transferminspeed 10")
 
 ##############################################################################
 ###                         - transfer max speed -                         ###
 ### Per-transfer max speed in KB/sec used unless 'chmaxs' set per pack.    ###
-    print "transfermaxspeed 4096"
+    myprint("transfermaxspeed 4096")
 
 ##############################################################################
 ###                        - bandwidth limiting -                          ###
@@ -1233,7 +1240,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### overallmaxspeed is the general limit, overallmaxspeeddayspeed is the   ###
 ### limit during the hours defined by overallmaxspeeddaytime (0 ... 23)    ###
 ### (no looping) and during days of week ( MTWRFSU )                       ###
-    print "overallmaxspeed 8192"
+    myprint("overallmaxspeed 8192")
 #overallmaxspeeddayspeed 100
 #overallmaxspeeddaytime 9 17
 #overallmaxspeeddaydays MTWRF
@@ -1266,12 +1273,12 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ###                       - ignore upload bandwidth -                      ###
 ### don't count uploads traffic into transferlimits.                       ###
 ### Fast uploads will stop any downloads without this option.              ###
-    print "ignoreuploadbandwidth"
+    myprint("ignoreuploadbandwidth")
 
 ##############################################################################
 ###                         - extend status line -                         ###
 ### print out upload and download bandwidth in status line.                ###
-    print "extend_status_line"
+    myprint("extend_status_line")
 
 ##############################################################################
 ###                        - status time dcc chat -                        ###
@@ -1311,13 +1318,13 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 #autosendpack 1 !rules Sending you the rules.
 #autosendpack 2 !faq Sending you the FAQ.
     for (num, trigger, msg) in autosend_list:
-      print "autosendpack %s %s %s" % (num, trigger, msg)
+      myprint("autosendpack %s %s %s" % (num, trigger, msg))
 
 ##############################################################################
 ###                             - headline -                               ###
 ### Put a headline at the top of all xdcc lists                            ###
 #headline New Stuff Just Added!!
-    print "headline %s" % headline
+    myprint("headline %s" % headline)
 
 ##############################################################################
 ###                           - credit line -                              ###
@@ -1388,9 +1395,9 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 #adminhost *!~me@*.domain.com
 #adminhost *!me@192.168.10.#
 #adminhost telnet!*@telnet
-    print "adminpass %s" % adminpass
+    myprint("adminpass %s" % adminpass)
     for domain in adminhost:
-      print "adminhost %s" % domain.strip()
+      myprint("adminhost %s" % domain.strip())
 
 ##############################################################################
 ###                       - remote admin level -                           ###
@@ -1401,7 +1408,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### 4 = remove packs                                                       ###
 ### 5 = full, may rename or removes files on disk                          ###
 ### Default: 5                                                             ###
-    print "adminlevel 5"
+    myprint("adminlevel 5")
 
 ##############################################################################
 ###                     - remote half admin info -                         ###
@@ -1415,16 +1422,16 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 #hadminhost *!~me@*.domain.com
 #hadminhost *!me@192.168.10.#
 #hadminhost telnet!*@telnet
-    print "hadminpass %s" % hadminpass
+    myprint("hadminpass %s" % hadminpass)
     for domain in hadminhost:
-      print "hadminhost %s" % domain.strip()
+      myprint("hadminhost %s" % domain.strip())
 
 ##############################################################################
 ###                     - remote half admin level -                        ###
 ### Limit remote half admin commands to level.                             ###
 ### Values see adminlevel                                                  ###
 ### Default: 2                                                             ###
-    print "hadminlevel 4"
+    myprint("hadminlevel 4")
 
 ##############################################################################
 ###                        - remote group admin -                          ###
@@ -1442,7 +1449,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### Allow all admins to use passive DCC chat on the bot.                   ###
 ### Default: off.                                                          ###
 ### Admins must use "/MSG bot ADMIN password CHATME" instead.              ###
-    print "passive_dcc_chat"
+    myprint("passive_dcc_chat")
 
 ##############################################################################
 ###                          - upload directory -                          ###
@@ -1459,9 +1466,9 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 #uploaddir /home/me/upload
 #uploadmaxsize 10
     for dir in uploaddir_list:
-      print "uploaddir %s" % dir
+      myprint("uploaddir %s" % dir)
     for host in uploadhost_list:
-      print "uploadhost %s" % host
+      myprint("uploadhost %s" % host)
 
 ##############################################################################
 ###                          - upload min space -                          ###
@@ -1491,7 +1498,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ###                          - hide OS information -                       ###
 ### If you do not want iroffer to show OS information in version and quit  ###
 ### messages enable this option                                            ###
-    print "hideos"
+    myprint("hideos")
 
 ##############################################################################
 ###                        - log notices/messages -                        ###
@@ -1530,7 +1537,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ##############################################################################
 ###                           - timestamp console -                        ###
 ### If defined, iroffer will place timestamps on all console output        ###
-    print "timestampconsole"
+    myprint("timestampconsole")
 
 ##############################################################################
 ###                             - quiet mode -                             ###
@@ -1557,7 +1564,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ##############################################################################
 ###                        - no minspeed on free -                         ###
 ### Don't enforce minspeed when bot still has free slots.                  ###
-    print "no_minspeed_on_free"
+    myprint("no_minspeed_on_free")
 
 ##############################################################################
 ###                      - disable md5sum of files -                       ###
@@ -1650,3 +1657,6 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ##############################################################################
 ##                                    End                                   ##
 ##############################################################################
+    if print_config:
+      print config.confstr
+    return config.confstr
