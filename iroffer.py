@@ -26,7 +26,8 @@ def parse_arguments(telnet_port):
 
 def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_list, autosend_list,
            headline, adminpass, adminhost, hadminpass, hadminhost, telnet_port=None, restrictprivlistmsg=None,
-           uploaddir_list=[], uploadhost_list=[], downloadhost_list=[], print_config=True):
+           uploaddir_list=[], uploadhost_list=[], downloadhost_list=[], print_config=True, realname=None,
+           autoadd_time=0, autoadd_delay=300, autoadd_dirs=[], autoadd_group_match=[], autoadd_sort=[], autoaddann="", autoaddann_short=False):
     if "-t" in sys.argv[1:] or "--telnet" in sys.argv[1:]:
         parse_arguments(telnet_port)
 
@@ -390,6 +391,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### To restrict to IPv4 use local_vhost 0.0.0.0                            ###
 ### To restrict to IPv6 use local_vhost ::                                 ###
 #local_vhost 123.456.789.123
+    myprint("local_vhost 0.0.0.0")
 
 ##############################################################################
 ###                      - manual dcc ip translation -                     ###
@@ -554,7 +556,7 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ###                          - user information -                          ###
 ### user_nick global setting is required, can be changed per network       ###
     myprint("user_nick %s" % nick)
-    myprint("user_realname %s" % mybot)
+    myprint("user_realname %s" % (mybot if realname is None else realname))
 
 ##############################################################################
 ###                             - user mode -                              ###
@@ -837,12 +839,16 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### When configured, each add will be announced on all channels with <msg> ###
 ### patterns.                                                              ###
 #autoaddann added
+    if autoaddann:
+        myprint("autoaddann %s" % autoaddann)
 
 ##############################################################################
 ###                 - auto add announce short -                            ###
 ### When configured, each add will be announced on all channels with pack  ###
 ### Number and Filename.                                                   ###
 #autoaddann_short
+    if autoaddann_short:
+        myprint("autoaddann_short")
 
 ##############################################################################
 ###                - auto add announce match -                             ###
@@ -869,12 +875,16 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### Time in seconds when the bot checks for new files in autoadd_dir.      ###
 ### Default: 0 = disabled.                                                 ###
 #autoadd_time 300
+    if autoadd_time>0:
+        myprint('autoadd_time %s' % autoadd_time)
 
 ##############################################################################
 ###                      - auto add delay -                                ###
 ### Time in seconds that files must been unchanged to be added.            ###
 ### Default: 0 = disabled.                                                 ###
 #autoadd_delay 300
+    if autoadd_delay > 0:
+        myprint('autoadd_delay %s' % autoadd_delay)
 
 ##############################################################################
 ###                       - auto add dir -                                 ###
@@ -883,6 +893,8 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### You can list multiple directories here.                                ###
 #autoadd_dir /home/me/new
 #autoadd_dir /home/other/new
+    for dir in autoadd_dirs:
+        myprint('autoadd_dir %s' % dir)
 
 ##############################################################################
 ###                      - auto add group -                                ###
@@ -895,6 +907,8 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### the given pattern with the full path of the file.                      ###
 #autoadd_group_match NEWVIDEO *.avi
 #autoadd_group_match NEWMUSIC *.mp3
+    for group, match in autoadd_group_match:
+        myprint('autoadd_group_match %s %s' % (group, match))
 
 ##############################################################################
 ###                      - auto add color -                                ###
@@ -949,6 +963,8 @@ def config(mybot, nick, path, nickserv_pass, server_list, chan_list, filedir_lis
 ### TIME = sorted by file modification time   -TIME = backwards sort       ###
 ### ADDED = sorted by file add time           -ADDED = backwards sort      ###
 #autoadd_sort GROUP NAME
+    if autoadd_sort:
+        myprint("autoadd_sort %s" % " ".join(autoadd_sort))
 
 ##############################################################################
 ###                     - no natural sort -                                ###
